@@ -90,3 +90,4 @@ NAT was not configured on the edge router, so traffic from the private inside ne
 ## What I'd do differently
 
 - Test my theory by configuring the fix myself before checking the answer.
+- Use `tracert` from Sales 2 instead of pinging each hop one at a time. It would show where traffic stops in one command.
