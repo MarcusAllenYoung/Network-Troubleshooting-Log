@@ -15,15 +15,3 @@ Each entry records what I saw, what I checked and in what order, what was actual
 |---|------|--------|-------|------------|
 | [01](01-port-security-violation.md) | 2026-11-17 | Witty Networks: Night Jackal | Media 1 can't retrieve a file from the File Server | Port security violation |
 | [02](02-missing-nat.md) | 2026-11-18 | Witty Networks: Nova Delta | Sale 2 can't reach a website | Missing NAT on the edge router |
-
-## Entry Format
-
-Each entry follows the same structure. See [TEMPLATE.md](TEMPLATE.md).
-
-1. **Ticket:** the problem as it was reported
-2. **What I saw:** initial symptoms
-3. **What I checked:** each step, in order, with commands and results
-4. **Root cause:** what was actually wrong
-5. **Fix:** the change made
-6. **Verification:** how I confirmed it was resolved
-7. **What I'd do differently:** optional
