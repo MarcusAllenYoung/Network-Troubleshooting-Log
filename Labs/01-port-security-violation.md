@@ -88,16 +88,6 @@ Port security on ASW1 F0/3 (the Media 1 port) had already learned a sticky MAC a
 
 `clear port-security sticky` deleted the learned address, so the port could learn Media 1's MAC.
 
-## What I learned
-
-- An APIPA address on one PC, while every other PC works, points to a problem close to that PC rather than routing.
-- `show cdp neighbors detail` can map which ports are uplinks when the topology doesn't show port numbers.
-- `show port-security` shows violation counts per port, which helped me find the affected port without knowing the port mapping.
-- `clear port-security sticky` can clear a violation when `shutdown` / `no shutdown` aren't available.
-- Shut / no shut only recovers an err-disabled port. `show interfaces status` showed F0/3 as connected, so the port never shut down. A port that stays up and keeps counting violations is most likely in restrict mode.
-- `show port-security interface f0/3` shows the violation mode, max MAC count, and last violating MAC. `show port-security address` lists the sticky MACs to compare against the PC's MAC.
-- `show mac address-table` maps MACs to ports. Matching those against each PC's `ipconfig /all` shows which port a PC is on. A PC blocked by port security won't appear.
-
 ## What I'd do differently
 
 - Check port security earlier when a single PC on an access switch has no IP and everything else works.
