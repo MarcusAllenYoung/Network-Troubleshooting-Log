@@ -86,6 +86,13 @@ DHCP worked and Media 1 received an IP. I retried the FTP connection to the File
 
 A port security violation on ASW1 F0/3 (the Media 1 port) blocked Media 1 from getting an IP through DHCP, so it could not reach the File Server.
 
+## What I learned
+
+- An APIPA address on one PC, while every other PC works, points to a problem close to that PC rather than routing.
+- `show cdp neighbors detail` can map which ports are uplinks when the topology doesn't show port numbers.
+- `show port-security` shows violation counts per port, which helped me find the affected port without knowing the port mapping.
+- `clear port-security sticky` can clear a violation when `shutdown` / `no shutdown` aren't available.
+
 ## What I'd do differently
 
 - Check port security earlier when a single PC on an access switch has no IP and everything else works.
