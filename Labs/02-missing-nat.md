@@ -83,4 +83,8 @@ NAT was not configured on the edge router, so traffic from the private inside ne
 ## What I'd do differently
 
 - Test my theory by configuring the fix myself before checking the answer.
-- Use `tracert` from Sales 2 instead of pinging each hop one at a time. It would show where traffic stops in one command.
+- Use `tracert` instead of pinging each hop.
+- Check the edge router sooner since every PC was affected.
+- Ping the website's IP early to rule out DNS.
+- Verify NAT with `show ip nat translations`.
+- Use an ACL that matches only the inside networks.

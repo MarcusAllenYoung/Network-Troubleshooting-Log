@@ -90,5 +90,7 @@ Port security on ASW1 F0/3 (the Media 1 port) had already learned a sticky MAC a
 
 ## What I'd do differently
 
-- Check port security earlier when a single PC on an access switch has no IP and everything else works.
+- Check port security earlier when one PC has no IP and everything else works.
 - Check the violation mode and sticky MACs with `show port-security interface` before trying to reset the port.
+- Confirm Media 1's port with `show mac address-table` instead of assuming F0/3.
+- Verify the fix on the switch with `show port-security interface f0/3`.
