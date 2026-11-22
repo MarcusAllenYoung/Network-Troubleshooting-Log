@@ -19,8 +19,6 @@ C:\>ftp 192.168.2.250
 
 The issue is confirmed.
 
-<img src="images/01-ftp-timeout.png" alt="FTP timeout from Media 1" width="360">
-
 ## Step 2 | Determine the scope
 
 I ran the same FTP check from Media 2-4 and Sales 1-4. All of them could retrieve Lab.txt.
