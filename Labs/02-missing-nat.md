@@ -84,7 +84,11 @@ NAT was not configured on the edge router, so traffic from the private inside ne
 
 - When every PC has the same problem, the cause is likely somewhere they all share, not on one PC.
 - Pinging each hop in order shows exactly where traffic stops.
-- A private inside network needs NAT on the edge router to reach the internet.
+- A private inside network needs NAT on the edge router to reach the internet. Packets can leave with a private source address, but replies can't route back to it.
+- Pinging the edge router's outside interface still worked because it stays inside my network. Anything past it needs a reply from the internet, which needs NAT.
+- `hostname unresolved` means DNS failed. Pinging the website's IP tests connectivity without DNS. When both fail, the problem is reaching the internet, and the DNS failure is a symptom.
+- A standard ACL only takes a source, so it's `access-list 1 permit any` with no `ip` keyword.
+- `show ip nat translations` and `show ip nat statistics` verify NAT is working.
 - I could configure NAT/PAT from memory once I tried.
 
 ## What I'd do differently

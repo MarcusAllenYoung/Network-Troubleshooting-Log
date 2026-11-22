@@ -84,7 +84,9 @@ DHCP worked and Media 1 received an IP. I retried the FTP connection to the File
 
 ## Root cause
 
-A port security violation on ASW1 F0/3 (the Media 1 port) blocked Media 1 from getting an IP through DHCP, so it could not reach the File Server.
+Port security on ASW1 F0/3 (the Media 1 port) had already learned a sticky MAC address that wasn't Media 1's. That filled the allowed MAC limit, so the switch dropped Media 1's frames, including its DHCP requests. Media 1 never got an IP and could not reach the File Server.
+
+`clear port-security sticky` deleted the learned address, so the port could learn Media 1's MAC.
 
 ## What I learned
 
@@ -92,6 +94,9 @@ A port security violation on ASW1 F0/3 (the Media 1 port) blocked Media 1 from g
 - `show cdp neighbors detail` can map which ports are uplinks when the topology doesn't show port numbers.
 - `show port-security` shows violation counts per port, which helped me find the affected port without knowing the port mapping.
 - `clear port-security sticky` can clear a violation when `shutdown` / `no shutdown` aren't available.
+- Shut / no shut only recovers an err-disabled port. `show interfaces status` showed F0/3 as connected, so the port never shut down. A port that stays up and keeps counting violations is most likely in restrict mode.
+- `show port-security interface f0/3` shows the violation mode, max MAC count, and last violating MAC. `show port-security address` lists the sticky MACs to compare against the PC's MAC.
+- `show mac address-table` maps MACs to ports. Matching those against each PC's `ipconfig /all` shows which port a PC is on. A PC blocked by port security won't appear.
 
 ## What I'd do differently
 
