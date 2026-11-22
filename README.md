@@ -14,4 +14,4 @@ Each entry records what I saw, what I checked and in what order, what was actual
 | # | Date | Source | Issue | Root Cause |
 |---|------|--------|-------|------------|
 | [01](Labs/01-port-security-violation.md) | 2026-11-17 | Witty Networks: Night Jackal | Media 1 can't retrieve a file from the File Server | Port security violation |
-| [02](Labs/02-missing-nat.md) | 2026-11-18 | Witty Networks: Nova Delta | Sale 2 can't reach a website | Missing NAT on the edge router |
+| [02](Labs/02-missing-nat.md) | 2026-11-18 | Witty Networks: Nova Delta | Sales 2 can't reach a website | Missing NAT on the edge router |

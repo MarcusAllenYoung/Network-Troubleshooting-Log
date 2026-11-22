@@ -1,4 +1,4 @@
-# 02 | Sale 2 can't reach a website (missing NAT on the edge router)
+# 02 | Sales 2 can't reach a website (missing NAT on the edge router)
 
 **Date:** 2026-11-18
 **Source:** [Witty Networks CCNA Packet Tracer Troubleshooting Labs: Nova Delta](https://wittynetworks.net/courses/ccna-packet-tracer-troubleshooting-labs/lessons/nova-delta/)
@@ -6,23 +6,76 @@
 **Ticket:**
 > The user at Sale 2 is stating that they are unable to get to the website wittynetworks.net. Investigate and resolve the issue, if possible.
 
-## What I checked
-1. Remembered from my CCNA studies that the inside network needs NAT to reach the internet.
-2. Checked the edge router and found NAT was not configured.
+---
 
-## Root cause
-NAT was missing on the edge router, so traffic from the inside network could not reach the website.
+## Step 1 | Confirm the issue
 
-## Fix
-At first I didn't configure it because I felt like I had forgotten how, so I looked up the answer. That only confirmed NAT was the issue. Later, without looking at any commands, I configured NAT on the edge router myself:
+From the Sales 2 browser, I tried to reach wittynetworks.net. It failed with `hostname unresolved`. The issue is confirmed on Sales 2.
+
+## Step 2 | Determine the scope
+
+I ran the same check from the other PCs. All of them returned the same `hostname unresolved` error, so the issue affects every PC, not just Sales 2.
+
+## Step 3 | Check the Sales 2 network configuration
+
+```
+ipconfig /all
+```
+
+Sales 2 had a correct IP address and default gateway, and its DNS server was 8.8.8.8. Since the PC configuration was correct, I moved to Layer 3 to check routing.
+
+## Step 4 | Ping test along the path
+
+From Sales 2, I pinged each hop on the way out:
+
+| # | Target | Result |
+|---|--------|--------|
+| 1 | Default gateway | Successful |
+| 2 | DSW1 | Successful |
+| 3 | CSW | Successful |
+| 4 | Edge router inside interface | Successful |
+| 5 | Edge router outside interface (172.32.1.1) | Successful |
+| 6 | DNS server (8.8.8.8) | Failed |
+| 7 | wittynetworks.net (by name) | Failed |
+| 8 | wittynetworks.net (by IP) | Failed |
+
+Traffic reached the edge router's outside interface but nothing beyond it, so the connection stops at the edge router.
+
+## Step 5 | Check the edge router
+
+From the Admin PC, I SSH'd into the edge router. From my CCNA studies, I knew the inside network would need NAT to reach the internet.
+
+```
+show run
+```
+
+NAT was not configured. My theory was that missing NAT was the issue.
+
+I didn't configure it right away because I wasn't confident I remembered how. I checked the lab's answer, which only said that NAT needed to be configured on the edge router. It didn't include any commands. That confirmed my diagnosis.
+
+## Step 6 | Fix the issue
+
+Later, without looking at any commands or guidance, I configured NAT on the edge router on my own:
 
 - `ip nat inside` and `ip nat outside` on the interfaces
-- `access-list 1` to match the inside traffic
+- A standard ACL to match the inside traffic:
+
+```
+access-list 1 permit any
+```
+
 - PAT using the outside interface:
 
 ```
 ip nat inside source list 1 interface g0/0/0 overload
 ```
 
-## Verification
-- After NAT was configured, the PCs could reach the website.
+## Step 7 | Verify
+
+I tested from the PCs, and all of them could reach wittynetworks.net.
+
+---
+
+## Root cause
+
+NAT was not configured on the edge router, so traffic from the private inside network could not reach the internet. Because the PCs couldn't reach the DNS server (8.8.8.8), they also couldn't resolve wittynetworks.net, which caused the `hostname unresolved` error.
