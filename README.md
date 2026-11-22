@@ -13,7 +13,7 @@ Each entry records what I saw, what I checked and in what order, what was actual
 
 | # | Date | Source | Issue | Root Cause |
 |---|------|--------|-------|------------|
-| | | | | |
+| [01](01-port-security-violation.md) | 2026-11-17 | Witty Networks: Night Jackal | Media 1 can't retrieve a file from the File Server | Port security violation |
 
 ## Entry Format
 
