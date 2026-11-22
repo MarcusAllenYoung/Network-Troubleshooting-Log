@@ -6,23 +6,89 @@
 **Ticket:**
 > The User at Media 1 is unable to retrieve the file Lab.txt from the File Server. Investigate the issue and resolve, if possible. Use the Admin PC for remote access to network devices.
 
-## What I saw
-- The PC had an APIPA (169.254.x.x) address, so it had no working IP.
+---
 
-## What I checked
-1. `ipconfig` on the PC: APIPA address.
-2. Used CDP to figure out which switch ports connected to the distribution switches.
-3. Port security came to mind as a possible cause. Checked it and found the port with violations.
+## Step 1 | Confirm the issue on Media 1
 
-## Root cause
-Port security violation on the switch port, so the port was not passing traffic.
+From the Media 1 command prompt, I tried to retrieve Lab.txt from the File Server over FTP.
 
-## Fix
-I knew `shutdown` / `no shutdown` resets a port after a violation, but those commands were disabled in this lab. I looked up another way to clear it and used:
+```
+C:\>ftp 192.168.2.250
+%Error opening ftp://192.168.2.250/ (Timed out)
+```
+
+The issue is confirmed.
+
+<img src="images/01-ftp-timeout.png" alt="FTP timeout from Media 1" width="360">
+
+## Step 2 | Determine the scope
+
+I ran the same FTP check from Media 2-4 and Sales 1-4. All of them could retrieve Lab.txt.
+
+- The issue only affects Media 1.
+- Since every other PC can reach the File Server, this is likely not a routing issue.
+
+## Step 3 | Check the Media 1 configuration
+
+```
+ipconfig /all
+```
+
+Media 1 had an APIPA address (169.254.173.34), so it was not getting a working IP.
+
+## Step 4 | Try to get a new IP on Media 1
+
+```
+ipconfig /release
+ipconfig /renew
+```
+
+The DHCP request failed. Since all the other PCs can get IPs and retrieve the file, I ruled out a Layer 3 routing issue and moved to Layers 1 and 2.
+
+## Step 5 | Check Layers 1 and 2 on ASW1
+
+From the Admin PC, I SSH'd into ASW1, the access switch Media 1 connects to.
+
+| # | Command | Result |
+|---|---------|--------|
+| 1 | `show interfaces status` | All ports connected and in the correct VLAN (10) |
+| 2 | `show run` | Disabled for this lab |
+| 3 | `show ip interface brief` | Nothing useful |
+| 4 | `show cdp neighbors detail` | F0/1 and F0/2 connect to DSW1 and DSW2, so F0/3-6 connect to the PCs. The topology doesn't show port numbers, so I didn't know which port was Media 1 |
+| 5 | `show interfaces f0/3` through `f0/6` | Nothing that stood out |
+| 6 | `show port-security` | Port security configured. **F0/3 had 9 security violations**, all other ports had 0 |
+
+After check 5, I stopped and thought about what else could block a single PC at the access port, and port security came to mind.
+
+Since F0/3 was the only port with violations, my working assumption was that F0/3 was the Media 1 port.
+
+## Step 6 | Fix the issue
+
+From my CCNA studies, I knew that `shutdown` / `no shutdown` resets a port after a port security violation. Those commands were disabled in this lab.
+
+I searched for other ways to fix a port security violation. The first suggestions were shut / no shut, or removing port security with `no switchport port-security`, which was also disabled. When I asked again and said I couldn't use `shutdown`, `switchport`, or `no`, it suggested:
 
 ```
 clear port-security sticky
 ```
 
+## Step 7 | Verify
+
+On Media 1:
+
+```
+ipconfig /renew
+```
+
+DHCP worked and Media 1 received an IP. I retried the FTP connection to the File Server and was able to retrieve Lab.txt.
+
+---
+
+## Root cause
+
+A port security violation on ASW1 F0/3 (the Media 1 port) blocked Media 1 from getting an IP through DHCP, so it could not reach the File Server.
+
 ## What I'd do differently
+
+- Check port security earlier when a single PC on an access switch has no IP and everything else works.
 - Learn other ways to recover a port from a port security violation besides shut / no shut.
