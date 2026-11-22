@@ -101,4 +101,4 @@ Port security on ASW1 F0/3 (the Media 1 port) had already learned a sticky MAC a
 ## What I'd do differently
 
 - Check port security earlier when a single PC on an access switch has no IP and everything else works.
-- Learn other ways to recover a port from a port security violation besides shut / no shut.
+- Check the violation mode and sticky MACs with `show port-security interface` before trying to reset the port.
