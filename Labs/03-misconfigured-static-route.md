@@ -63,7 +63,7 @@ On each device, I ran `show ip route` to check for a route to the Sales network,
 | 3 | Edge-SW (Layer 3 switch) | Correct |
 | 4 | BR1-RTR1 | **Wrong** |
 
-On BR1-RTR1, a static route sent the Sales network 10.30.30.0/30 to 12.12.12.1, which is toward the internet. It should point to 10.10.10.2, the Edge-SW. There was also a correct OSPF route, but the router was using the static route instead.
+On BR1-RTR1, there was a static route for 10.30.30.0/30 pointing to 12.12.12.1, which is toward the internet. Traffic for the Sales network should go to 10.10.10.2, the Edge-SW. The correct OSPF route for the Sales network was also in the routing table.
 
 ## Step 6 | Fix the issue
 
@@ -87,9 +87,11 @@ Both received an IP address. I pinged 13.13.13.1 and it was successful. The issu
 
 ## Root cause
 
-A misconfigured static route on BR1-RTR1 sent traffic for the Sales network 10.30.30.0/30 out toward the internet (12.12.12.1) instead of to the Edge-SW (10.10.10.2). The router used it over the correct OSPF route, so traffic going back to the Sales network was sent the wrong way.
+BR1-RTR1 had a static route for 10.30.30.0/30 pointing to 12.12.12.1 (toward the internet). The Sales network is 10.30.30.0/24 and was correctly learned through OSPF, but the router chooses the most specific matching prefix before it looks at administrative distance. Traffic to 10.30.30.0 through 10.30.30.3 matched the /30 and was sent toward the internet.
+
+The Sales gateway falls inside that /30. The DHCP relay sends requests with the gateway's IP as the relay address, and the DHCP server replies to that address. BR1-RTR1 sent those replies toward the internet, so the Sales PCs never received an IP address. Not reaching 13.13.13.1 was a symptom of DHCP failing.
 
 ## What I'd do differently
 
-- Run `show ip route 10.30.30.0` on each hop instead of reading the full routing table.
+- Run `show ip route 10.30.30.1` on each hop to see exactly which route the Sales gateway address uses, instead of reading the full routing table.
 - After the fix, check `show ip route` on BR1-RTR1 to confirm the OSPF route was installed.
