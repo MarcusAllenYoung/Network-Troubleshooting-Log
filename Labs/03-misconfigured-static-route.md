@@ -94,4 +94,4 @@ The Sales gateway falls inside that /30. The DHCP relay sends requests with the 
 ## What I'd do differently
 
 - Run `show ip route 10.30.30.1` on each hop to see exactly which route the Sales gateway address uses, instead of reading the full routing table.
-- After the fix, check `show ip route` on BR1-RTR1 to confirm the OSPF route was installed.
+- After the fix, run `show ip route 10.30.30.1` on BR1-RTR1 to confirm the Sales network now uses the OSPF route.
