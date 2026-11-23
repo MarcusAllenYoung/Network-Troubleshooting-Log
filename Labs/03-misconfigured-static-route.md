@@ -89,8 +89,6 @@ Both received an IP address. I pinged 13.13.13.1 and it was successful. The issu
 
 BR1-RTR1 had a static route for 10.30.30.0/30 pointing to 12.12.12.1 (toward the internet). The Sales network is 10.30.30.0/24 and was correctly learned through OSPF, but the router chooses the most specific matching prefix before it looks at administrative distance. Traffic to 10.30.30.0 through 10.30.30.3 matched the /30 and was sent toward the internet.
 
-The Sales gateway falls inside that /30. The DHCP relay sends requests with the gateway's IP as the relay address, and the DHCP server replies to that address. BR1-RTR1 sent those replies toward the internet, so the Sales PCs never received an IP address. Not reaching 13.13.13.1 was a symptom of DHCP failing.
-
 ## What I'd do differently
 
 - Run `show ip route 10.30.30.1` on each hop to see exactly which route the Sales gateway address uses, instead of reading the full routing table.
